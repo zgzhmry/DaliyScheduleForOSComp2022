@@ -132,7 +132,34 @@ fn main() {
     });
 }
 ````
-````#[repr(u8)]````的作用是指定内存布局的方式，在这里指定的是依照8位对齐，后面给出了一个枚举，但是后面分配的方法很有意思，这里没有给后面的匹配模式添加前缀，这也就意味着，无论如何，都只能得到First匹配。
+````#[repr(u8)]````的作用是指定内存布局的方式，在这里指定的是依照8位对齐，后面给出了一个枚举，但是后面分配的方法很有意思，这里没有给后面的匹配模式添加前缀，这也就意味着，无论如何，都只能匹配First。
+## Quiz10
+````rust
+trait Trait {
+    fn f(&self);
+}
+
+impl<'a> dyn Trait + 'a {
+    fn f(&self) {
+        print!("1");
+    }
+}
+
+impl Trait for bool {
+    fn f(&self) {
+        print!("2");
+    }
+}
+
+fn main() {
+    Trait::f(&true);
+    Trait::f(&true as &dyn Trait);
+    <_ as Trait>::f(&true);
+    <_ as Trait>::f(&true as &dyn Trait);
+    <bool as Trait>::f(&true);
+}
+````
+本题在特性当中定义了一个了一个f函数，这个函数在实现的时候有两种不同的实现方式，在main函数的调用当中，所有的调用都是通过布尔类型对f进行调用，因此都输出2
 ## Quiz18
 ````rust
 struct S {
@@ -235,3 +262,30 @@ fn main() {
 }
 ````
 map操作在值从迭代器当中消耗掉过后才会被调用，因此在这里闭包打印的数字将会和p的值交叉出现，并且是p值优先打印。
+## Quiz33
+````rust
+use std::ops::RangeFull;
+
+trait Trait {
+    fn method(&self) -> fn();
+}
+
+impl Trait for RangeFull {
+    fn method(&self) -> fn() {
+        print!("1");
+        || print!("3")
+    }
+}
+
+impl<F: FnOnce() -> T, T> Trait for F {
+    fn method(&self) -> fn() {
+        print!("2");
+        || print!("4")
+    }
+}
+
+fn main() {
+    (|| .. .method())();
+}
+````
+本题的重点在于理解main函数当中的语句是什么意思。这里让我想到了大一的时候有个老师跟我们开的玩笑，他说如果让他来出C语言的期末考试题，那么他一定会在第一题给一个超级长的表达式然后让大家判断优先级和输出结果——实际上这里就是这种情况，
