@@ -78,6 +78,52 @@ fn main() {
 }
 ````
 本题给出了一个结构体S，但是后面给出了一个const，将S中x的值指定为2，在后面的运算当中自然就不能被重新赋值。这个和C/C++的常量基本是一样的，因此不多作解释。
+## Quiz18
+````rust
+struct S {
+    f: fn(),
+}
+
+impl S {
+    fn f(&self) {
+        print!("1");
+    }
+}
+
+fn main() {
+    let print2 = || print!("2");
+    S { f: print2 }.f();
+}
+````
+这里结构体S，并且为S定义了一个结构体成员并为其设置了一个成员方法，在main函数调用的时候，实质上是调用的S当中的方法，也就是````print!("1")````
+## Quiz25
+````rust
+use std::fmt::{self, Display};
+
+struct S;
+
+impl Display for S {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("1")
+    }
+}
+
+impl Drop for S {
+    fn drop(&mut self) {
+        print!("2");
+    }
+}
+
+fn f() -> S {
+    S
+}
+
+fn main() {
+    let S = f();
+    print!("{}", S);
+}
+````
+
 ## Quiz26
 ````rust
 fn main() {
@@ -95,3 +141,4 @@ fn main() {
     }
 }
 ````
+map操作在值从迭代器当中消耗掉过后才会被调用，因此在这里闭包打印的数字将会和p的值交叉出现，并且是p值优先打印。
