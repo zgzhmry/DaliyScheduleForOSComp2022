@@ -78,6 +78,61 @@ fn main() {
 }
 ````
 本题给出了一个结构体S，但是后面给出了一个const，将S中x的值指定为2，在后面的运算当中自然就不能被重新赋值。这个和C/C++的常量基本是一样的，因此不多作解释。
+## Quiz5
+````rust
+trait Trait {
+    fn p(self);
+}
+
+impl<T> Trait for fn(T) {
+    fn p(self) {
+        print!("1");
+    }
+}
+
+impl<T> Trait for fn(&T) {
+    fn p(self) {
+        print!("2");
+    }
+}
+
+fn f(_: u8) {}
+fn g(_: &u8) {}
+
+fn main() {
+    let a: fn(_) = f;
+    let b: fn(_) = g;
+    let c: fn(&_) = g;
+    a.p();
+    b.p();
+    c.p();
+}
+````
+这里的代码虽然很长，但实际上就只是````fn()````当中有无&的问题，有就是2，没有就是1。
+## Quiz7
+````rust
+#[repr(u8)]
+enum Enum {
+    First,
+    Second,
+}
+
+impl Enum {
+    fn p(self) {
+        match self {
+            First => print!("1"),
+            Second => print!("2"),
+        }
+    }
+}
+
+fn main() {
+    Enum::p(unsafe {
+        std::mem::transmute(1u8)
+    });
+}
+````
+本质上是unsafe的匹配，1u8
 ## Quiz18
 ````rust
 struct S {
@@ -96,6 +151,23 @@ fn main() {
 }
 ````
 这里结构体S，并且为S定义了一个结构体成员并为其设置了一个成员方法，在main函数调用的时候，实质上是调用的S当中的方法，也就是````print!("1")````
+## Quiz19
+````rust
+struct S;
+
+impl Drop for S {
+    fn drop(&mut self) {
+        print!("1");
+    }
+}
+
+fn main() {
+    let s = S;
+    let _ = s;
+    print!("2");
+}
+````
+这道题就比较简单了，首先正常打印2，然后在主函数结束的时候S被释放，打印1。但是这道题的解答很有意思，提到了这里如果在````let _ = s;````移动了s，那么s会被立即释放，S的Drop就会被激活，最终的打印结果就是12。
 ## Quiz25
 ````rust
 use std::fmt::{self, Display};
