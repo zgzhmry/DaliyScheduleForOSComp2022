@@ -171,6 +171,30 @@ fn main() {
 }
 ````
 本题在特性当中定义了一个了一个f函数，这个函数在实现的时候有两种不同的实现方式，在main函数的调用当中，所有的调用都是通过布尔类型对f进行调用，因此都输出2
+## Quiz15
+````rust
+trait Trait {
+    fn f(&self);
+}
+
+impl Trait for u32 {
+    fn f(&self) {
+        print!("1");
+    }
+}
+
+impl<'a> Trait for &'a i32 {
+    fn f(&self) {
+        print!("2");
+    }
+}
+
+fn main() {
+    let x = &0;
+    x.f();
+}
+````
+在main函数的第一句，将变量````x````赋予了&0，因此符合u32，所以调用了第一种方法。
 ## Quiz18
 ````rust
 struct S {
@@ -326,6 +350,34 @@ fn main() {
 }
 ````
 这里的输出顺序是，正常打印一个3，然后在````let _ = Guard;````由于这里Guard没有赋予给任何变量，因此它被立即释放了，第一次激活了Drop,打印了一个1，之后又正常打印2，最后在main函数结束的时候，````_guard````被释放，第二次激活Drop。
+## Quiz30
+````rust
+use std::rc::Rc;
+
+struct A;
+
+fn p<X>(x: X) {
+    match std::mem::size_of::<X>() {
+        0 => print!("0"),
+        _ => print!("1"),
+    }
+}
+
+fn main() {
+    let a = &A;
+    p(a);
+    p(a.clone());
+    
+    let b = &();
+    p(b);
+    p(b.clone());
+    
+    let c = Rc::new(());
+    p(Rc::clone(&c));
+    p(c.clone());
+}
+````
+
 ## Quiz33
 ````rust
 use std::ops::RangeFull;
