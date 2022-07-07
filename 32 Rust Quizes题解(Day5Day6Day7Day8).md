@@ -109,6 +109,17 @@ fn main() {
 }
 ````
 这里的代码虽然很长，但实际上就只是````fn()````当中有无&的问题，有就是2，没有就是1。
+## Quiz6
+````rust
+use std::mem;
+
+fn main() {
+    let a;
+    let a = a = true;
+    print!("{}", mem::size_of_val(&a));
+}
+````
+本题的核心是理解语句````let a = a = true;````的含义。Rust不能像C/C++那样在同一个表达式连续进行赋值，因此这里的````a = a = true````实质上应该理解为````a = (a = true)````。
 ## Quiz7
 ````rust
 #[repr(u8)]
@@ -216,6 +227,41 @@ fn main() {
 }
 ````
 这里的所有带“-”号的输入，并没有被识别为负数，而是单独作为一个字符。
+## Quiz23
+````rust
+trait Trait {
+    fn f(&self);
+    fn g(&self);
+}
+
+struct S;
+
+impl S {
+    fn f(&self) {
+        print!("1");
+    }
+
+    fn g(&mut self) {
+        print!("1");
+    }
+}
+
+impl Trait for S {
+    fn f(&self) {
+        print!("2");
+    }
+
+    fn g(&self) {
+        print!("2");
+    }
+}
+
+fn main() {
+    S.f();
+    S.g();
+}
+````
+本题为结构体S构建了两种不同的函数，这两种不同的函数有分别有两种不同的实现方法。在调用函数的时候会优先调用在结构体中声明的方法，因此当普通方法和特征方法在除了输出完全相同的时候，会执行普通方法。而对于g函数，这里在调用的时候是自动引用，自动引用不采用&mut，因此会调用特征方法。
 ## Quiz25
 ````rust
 use std::fmt::{self, Display};
@@ -262,6 +308,24 @@ fn main() {
 }
 ````
 map操作在值从迭代器当中消耗掉过后才会被调用，因此在这里闭包打印的数字将会和p的值交叉出现，并且是p值优先打印。
+## Quiz28
+````rust
+struct Guard;
+
+impl Drop for Guard {
+    fn drop(&mut self) {
+        print!("1");
+    }
+}
+
+fn main() {
+    let _guard = Guard;
+    print!("3");
+    let _ = Guard;
+    print!("2");
+}
+````
+这里的输出顺序是，正常打印一个3，然后在````let _ = Guard;````由于这里Guard没有赋予给任何变量，因此它被立即释放了，第一次激活了Drop,打印了一个1，之后又正常打印2，最后在main函数结束的时候，````_guard````被释放，第二次激活Drop。
 ## Quiz33
 ````rust
 use std::ops::RangeFull;
