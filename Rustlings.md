@@ -11,3 +11,43 @@
 1.执行完自动检查后，需要自行点击下一道题目，而不是自动跳转，跳转方式为点击报错信息中的题目链接，也可以自行点击其它题目完成，但是就不会在完成本题后自动测评下一题。  
 2.如果出现网络问题，导致在线桌面重新启动，有一定概率需要重新执行```cargo install --force --path .```后再执行```rustlings watch```才能继续。  
 3.建议在涉及到指定字符串输出的地方直接复制粘贴题目中的输出，否则如果由于字符输入错误导致输出不正确，排查起来是比较困难的。  
+# 一些很有意思的题目  
+1.if2
+```rust
+// if2.rs
+
+// Step 1: Make me compile!
+// Step 2: Get the bar_for_fuzz and default_to_baz tests passing!
+// Execute the command `rustlings hint if2` if you want a hint :)
+
+
+pub fn fizz_if_foo(fizzish: &str) -> &str {
+    if fizzish == "fizz" {
+        "foo"
+    } else {
+        1
+    }
+}
+
+// No test changes needed!
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn foo_for_fizz() {
+        assert_eq!(fizz_if_foo("fizz"), "foo")
+    }
+
+    #[test]
+    fn bar_for_fuzz() {
+        assert_eq!(fizz_if_foo("fuzz"), "bar")
+    }
+
+    #[test]
+    fn default_to_baz() {
+        assert_eq!(fizz_if_foo("literally anything"), "baz")
+    }
+}
+
+```
